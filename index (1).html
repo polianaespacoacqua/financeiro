@@ -1,0 +1,707 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+<meta name="apple-mobile-web-app-title" content="Minhas Contas"/>
+<meta name="theme-color" content="#1a0d12"/>
+<title>Minhas Contas 🌸</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet"/>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+:root{
+  --bg:#1a0d12;--bgCard:#221018;--bgRow:#180b10;--bgDeep:#0f0810;
+  --border:#3d1a26;--borderHov:#6b2d42;
+  --accent:#f43f7a;--accentSoft:#fb7aa8;--accentGlow:#f43f7a22;
+  --rose:#fda4af;--muted:#6b3348;--mutedText:#9f4d65;
+  --text:#fce7ef;--warn:#fbbf24;--danger:#fb7185;--green:#86efac;
+}
+html,body{height:100%;background:var(--bg);font-family:'Nunito','Segoe UI',sans-serif;color:var(--text);overflow-x:hidden;}
+body{padding-bottom:env(safe-area-inset-bottom);}
+::-webkit-scrollbar{width:4px;height:4px;}
+::-webkit-scrollbar-track{background:var(--bg);}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px;}
+input,select,button{font-family:'Nunito','Segoe UI',sans-serif;outline:none;-webkit-tap-highlight-color:transparent;}
+button{cursor:pointer;}
+.mono{font-family:'JetBrains Mono',monospace;}
+
+/* Layout */
+#app{max-width:560px;margin:0 auto;padding:24px 16px 90px;position:relative;z-index:1;}
+.glow{position:fixed;top:-150px;left:50%;transform:translateX(-50%);width:500px;height:350px;background:radial-gradient(ellipse,var(--accentGlow) 0%,transparent 70%);pointer-events:none;z-index:0;}
+
+/* Cards */
+.card{background:linear-gradient(145deg,var(--bgCard) 0%,#1e0e15 100%);border:1px solid var(--border);border-radius:22px;padding:20px;margin-bottom:12px;}
+
+/* Botões */
+.btn-ghost{background:transparent;border:1px solid var(--border);color:var(--mutedText);border-radius:10px;padding:8px 14px;font-size:12px;font-weight:700;transition:all .2s;}
+.btn-ghost:hover{border-color:var(--accent);color:var(--accent);}
+.btn-primary{background:linear-gradient(135deg,var(--accent),#c0134a);color:#fff;border:none;border-radius:12px;padding:11px 20px;font-weight:800;font-size:14px;box-shadow:0 4px 20px var(--accentGlow);}
+.btn-ok{background:linear-gradient(135deg,var(--accent),#c0134a);color:#fff;border:none;border-radius:8px;padding:5px 14px;font-size:12px;font-weight:800;}
+.btn-cancel{background:transparent;border:1px solid var(--border);border-radius:8px;padding:5px 10px;font-size:11px;color:var(--muted);font-weight:700;}
+
+/* Inputs */
+.inp{background:var(--bgRow);border:1px solid var(--border);border-radius:12px;padding:11px 14px;color:var(--text);font-size:14px;width:100%;transition:border .2s;}
+.inp:focus{border-color:var(--accent);}
+.inp::placeholder{color:var(--muted);}
+.inp-sm{background:var(--bgRow);border:1px solid var(--accent);border-radius:8px;padding:5px 8px;color:var(--text);font-size:13px;text-align:right;font-family:'JetBrains Mono',monospace;}
+
+/* Tab filtro */
+.filtro-wrap{display:flex;gap:4px;margin-bottom:12px;background:var(--bgRow);padding:4px;border-radius:14px;border:1px solid var(--border);}
+.ftab{flex:1;padding:8px 16px;border-radius:99px;font-size:12px;font-weight:800;border:none;transition:all .2s;color:var(--muted);background:transparent;}
+.ftab.active{background:linear-gradient(135deg,var(--accent),#c0134a);color:#fff;box-shadow:0 2px 12px var(--accentGlow);}
+
+/* Mês tabs */
+.mes-scroll{display:flex;gap:6px;overflow-x:auto;padding-bottom:6px;margin-bottom:14px;scrollbar-width:none;}
+.mes-scroll::-webkit-scrollbar{display:none;}
+.mes-btn{flex-shrink:0;padding:8px 14px;border-radius:10px;font-size:13px;font-weight:800;border:1px solid var(--border);background:var(--bgRow);color:var(--muted);transition:all .2s;white-space:nowrap;position:relative;}
+.mes-btn.active{background:linear-gradient(135deg,var(--accent),#c0134a);color:#fff;border-color:var(--accent);box-shadow:0 2px 12px var(--accentGlow);}
+.mes-btn.tem-dados{color:var(--accentSoft);border-color:#f43f7a44;}
+.mes-dot{position:absolute;top:3px;right:3px;width:5px;height:5px;border-radius:50%;background:var(--accent);}
+
+/* Resumo cards */
+.resumo-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:14px;}
+.resumo-card{background:var(--bgRow);border-radius:14px;padding:12px 8px;border:1px solid var(--border);text-align:center;}
+.resumo-val{font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;margin-bottom:3px;}
+.resumo-lbl{font-size:9px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.5px;}
+
+/* Barra progresso */
+.barra-wrap{margin-bottom:8px;}
+.barra-label{display:flex;justify-content:space-between;font-size:11px;color:var(--mutedText);font-weight:700;margin-bottom:4px;}
+.barra-bg{background:var(--bgRow);border-radius:99px;height:6px;overflow:hidden;}
+.barra-fill{height:100%;border-radius:99px;transition:width .5s;}
+
+/* Conta row */
+.conta-wrap{background:var(--bgRow);border:1px solid var(--border);border-radius:14px;overflow:hidden;transition:border-color .2s;margin-bottom:8px;}
+.conta-wrap.open{border-color:var(--borderHov);}
+.conta-main{display:flex;align-items:center;gap:10px;padding:12px 14px;}
+.conta-info{flex:1;min-width:0;}
+.conta-nome{font-size:14px;font-weight:700;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:145px;}
+.conta-nome.pago{text-decoration:line-through;color:var(--mutedText);}
+.conta-cat{font-size:10px;font-weight:600;margin-top:3px;display:flex;align-items:center;gap:6px;flex-wrap:wrap;}
+.badge-fixo{font-size:9px;font-weight:800;color:var(--accent);background:var(--accentGlow);padding:2px 5px;border-radius:4px;text-transform:uppercase;border:1px solid #f43f7a44;}
+.badge-sub{font-size:9px;font-weight:800;color:var(--rose);background:#4a1a2a;padding:2px 5px;border-radius:4px;}
+.conta-valor-btn{background:transparent;border:1px solid transparent;border-radius:10px;padding:6px 10px;color:var(--text);font-family:'JetBrains Mono',monospace;font-size:15px;font-weight:700;min-width:70px;text-align:right;transition:all .2s;}
+.conta-valor-btn.sem-valor{background:#2a100a;border-color:#fbbf2444;color:var(--warn);}
+.btn-expand{background:transparent;border:none;color:var(--mutedText);font-size:18px;padding:0 4px;line-height:1;transition:transform .2s;}
+.btn-expand.open{transform:rotate(180deg);}
+.btn-del{background:transparent;border:none;color:var(--border);font-size:18px;padding:0 2px;line-height:1;transition:color .2s;}
+.btn-del:hover{color:var(--danger);}
+
+/* Check circle */
+.check-btn{border-radius:50%;display:flex;align-items:center;justify-content:center;padding:0;flex-shrink:0;transition:all .2s;}
+
+/* Sub-itens panel */
+.sub-panel{border-top:1px solid var(--border);padding:10px 14px 12px;}
+.sub-label{font-size:10px;color:var(--accent);font-weight:800;letter-spacing:1px;text-transform:uppercase;margin-bottom:8px;}
+.sub-row{display:flex;align-items:center;gap:8px;background:var(--bgDeep);border:1px solid var(--border);border-radius:10px;padding:8px 10px;margin-bottom:6px;transition:opacity .2s;}
+.sub-row.pago{opacity:.5;}
+.sub-nome{font-size:13px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.sub-nome.pago{text-decoration:line-through;color:var(--muted);}
+.sub-val{font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;color:var(--accentSoft);flex-shrink:0;}
+.sub-val.pago{color:var(--muted);}
+.btn-add-sub{width:100%;background:transparent;border:1px dashed var(--border);border-radius:10px;padding:7px;color:var(--muted);font-size:12px;font-weight:700;transition:all .2s;text-align:center;margin-top:2px;}
+.btn-add-sub:hover{border-color:var(--accent);color:var(--accent);}
+
+/* Sub form */
+.sub-form{background:var(--bgDeep);border:1px solid #f43f7a44;border-radius:12px;padding:12px;display:flex;flex-direction:column;gap:8px;margin-bottom:6px;}
+
+/* Day picker */
+.daypicker{position:absolute;z-index:300;right:0;top:calc(100% + 6px);background:#2a1020;border:1px solid var(--border);border-radius:16px;padding:14px;box-shadow:0 8px 32px #00000080;width:224px;}
+.daypicker-title{font-size:10px;color:var(--accentSoft);font-weight:800;letter-spacing:1px;text-transform:uppercase;margin-bottom:10px;text-align:center;}
+.daypicker-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;}
+.day-btn{background:transparent;border:1px solid transparent;border-radius:8px;padding:5px 0;font-size:12px;font-weight:600;color:var(--mutedText);transition:all .15s;}
+.day-btn.sel{background:linear-gradient(135deg,var(--accent),#c0134a);color:#fff;font-weight:800;border-color:transparent;}
+.day-btn:hover:not(.sel){background:#3d1a2644;color:var(--accentSoft);}
+.dp-remove{margin-top:10px;width:100%;background:transparent;border:1px dashed var(--border);border-radius:8px;padding:6px 0;color:var(--muted);font-size:11px;font-weight:700;}
+
+/* Venc badge */
+.venc-badge{font-size:10px;font-weight:700;padding:2px 6px;border-radius:99px;white-space:nowrap;display:inline-block;}
+
+/* Nav bottom */
+.nav{position:fixed;bottom:0;left:0;right:0;z-index:100;background:#1a0d12ee;backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-top:1px solid var(--border);display:flex;padding-bottom:env(safe-area-inset-bottom);}
+.nav-btn{flex:1;padding:12px 8px;border:none;font-size:12px;font-weight:800;letter-spacing:.5px;transition:all .2s;color:var(--muted);background:transparent;}
+.nav-btn.active{color:var(--accent);background:var(--accentGlow);}
+.nav-icon{font-size:20px;margin-bottom:2px;}
+
+/* Relatório */
+.rel-mes{background:var(--bgRow);border:1px solid var(--border);border-radius:14px;padding:14px 16px;margin-bottom:10px;}
+.rel-mes.negativo{border-color:#fb718555;}
+.rel-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px;}
+.rel-nome{font-size:15px;font-weight:800;color:var(--text);}
+.rel-sub{font-size:11px;color:var(--mutedText);margin-top:1px;}
+.rel-saldo{font-family:'JetBrains Mono',monospace;font-size:18px;font-weight:800;text-align:right;}
+.rel-status{font-size:10px;font-weight:700;text-align:right;margin-top:1px;}
+.rel-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:10px;}
+.rel-cell{background:var(--bgDeep);border-radius:10px;padding:8px 6px;text-align:center;border:1px solid var(--border);}
+
+/* Novo form conta */
+.nova-conta-form{background:var(--bgRow);border:1px solid var(--border);border-radius:16px;padding:16px;display:flex;flex-direction:column;gap:8px;margin-bottom:8px;}
+.btn-add-conta{width:100%;background:transparent;border:1px dashed var(--border);border-radius:14px;padding:12px;color:var(--muted);font-size:13px;font-weight:700;transition:all .2s;}
+.btn-add-conta:hover{border-color:var(--accent);color:var(--accent);}
+
+/* Edição inline main */
+.edit-main{display:flex;flex-direction:column;gap:5px;align-items:flex-end;position:relative;}
+.venc-btn-sm{background:transparent;border:1px solid var(--border);border-radius:8px;padding:3px 8px;color:var(--muted);font-size:11px;font-weight:700;white-space:nowrap;}
+.venc-btn-sm.tem{background:var(--accentGlow);border-color:#f43f7a55;color:var(--accentSoft);}
+
+/* Hidden */
+.hidden{display:none!important;}
+/* Grid 2 col */
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+/* Flex row */
+.row{display:flex;gap:8px;align-items:center;}
+/* Sem dados */
+.empty{text-align:center;padding:24px;color:var(--muted);font-size:13px;font-weight:600;}
+
+/* Fade anim */
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.fade{animation:fadeUp .3s ease forwards;}
+
+/* Install banner */
+.install-banner{background:linear-gradient(135deg,#2a1020,#1a0818);border:1px solid var(--accent);border-radius:16px;padding:16px;margin-bottom:14px;font-size:13px;line-height:1.6;}
+</style>
+</head>
+<body>
+<div class="glow"></div>
+<div id="app"></div>
+<nav class="nav">
+  <button class="nav-btn active" id="nav-contas" onclick="setPagina('contas')">
+    <div class="nav-icon">💳</div>Contas
+  </button>
+  <button class="nav-btn" id="nav-relatorio" onclick="setPagina('relatorio')">
+    <div class="nav-icon">📊</div>Relatório
+  </button>
+</nav>
+
+<script>
+// ─── Dados ────────────────────────────────────────────────────
+const C_ACCENT='#f43f7a', C_SOFT='#fb7aa8', C_ROSE='#fda4af';
+const C_MUTED='#6b3348', C_MUTEDTEXT='#9f4d65', C_TEXT='#fce7ef';
+const C_WARN='#fbbf24', C_DANGER='#fb7185', C_GREEN='#86efac';
+const C_BORDER='#3d1a26', C_ROW='#180b10', C_GLOW='#f43f7a22';
+
+const MESES=[
+  {idx:0,num:5, ano:2026,label:'Mai',nome:'Maio'},
+  {idx:1,num:6, ano:2026,label:'Jun',nome:'Junho'},
+  {idx:2,num:7, ano:2026,label:'Jul',nome:'Julho'},
+  {idx:3,num:8, ano:2026,label:'Ago',nome:'Agosto'},
+  {idx:4,num:9, ano:2026,label:'Set',nome:'Setembro'},
+  {idx:5,num:10,ano:2026,label:'Out',nome:'Outubro'},
+  {idx:6,num:11,ano:2026,label:'Nov',nome:'Novembro'},
+  {idx:7,num:12,ano:2026,label:'Dez',nome:'Dezembro'},
+];
+
+const CATEGORIAS={
+  cartao: {label:'Cartão/Banco',emoji:'💳',cor:'#e879a0'},
+  compras:{label:'Compras',     emoji:'🛍️',cor:'#fb923c'},
+  telefone:{label:'Telefone',   emoji:'📱',cor:'#f9a8d4'},
+  outros: {label:'Outros',      emoji:'📦',cor:'#c084a0'},
+};
+
+const CONTAS_BASE=[
+  {id:1, nome:'Will',               valor:0,  venc:null,cat:'outros',  fixo:false,sub:[]},
+  {id:2, nome:'Mercado Livre',      valor:63, venc:null,cat:'compras', fixo:false,sub:[]},
+  {id:3, nome:'Nubank',             valor:140,venc:null,cat:'cartao',  fixo:true, sub:[]},
+  {id:4, nome:'Iago',               valor:360,venc:null,cat:'outros',  fixo:false,sub:[]},
+  {id:5, nome:'C6',                 valor:0,  venc:null,cat:'cartao',  fixo:false,sub:[]},
+  {id:6, nome:'BB',                 valor:0,  venc:null,cat:'cartao',  fixo:false,sub:[]},
+  {id:7, nome:'Santander',          valor:140,venc:null,cat:'cartao',  fixo:true, sub:[]},
+  {id:8, nome:'Inter',              valor:0,  venc:null,cat:'cartao',  fixo:false,sub:[]},
+  {id:9, nome:'O Boticário',        valor:0,  venc:null,cat:'compras', fixo:false,sub:[]},
+  {id:10,nome:'Cartão Mercado Pago',valor:0,  venc:null,cat:'cartao',  fixo:false,sub:[]},
+  {id:11,nome:'TIM',                valor:62, venc:null,cat:'telefone',fixo:true, sub:[]},
+  {id:12,nome:'Cama Inter',         valor:0,  venc:null,cat:'compras', fixo:false,sub:[]},
+  {id:13,nome:'C&A',                valor:103,venc:null,cat:'compras', fixo:false,sub:[]},
+  {id:14,nome:'Shopee',             valor:0,  venc:null,cat:'compras', fixo:false,sub:[]},
+];
+
+const fmt=v=>(v||0).toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
+const uid=()=>Date.now()+Math.floor(Math.random()*9999);
+const deepClone=o=>JSON.parse(JSON.stringify(o));
+
+function criarMes(){
+  return {salario:null,contas:deepClone(CONTAS_BASE),pagas:{},subPagas:{}};
+}
+
+// ─── Estado global ─────────────────────────────────────────────
+let STATE={
+  pagina:'contas',
+  mesIdx:0,
+  dados: MESES.map(()=>criarMes()),
+  filtro:'todas',
+  openContaId:null,
+  editandoContaId:null,
+  addingSubContaId:null,
+  editingSubInfo:null, // {contaId, subId}
+  showDayPicker:null,  // {target, contaId, subId, tipo} tipo: 'main'|'sub'|'novo'|'nosub'
+  novoForm:false,
+  novoNome:'',novoVal:'',novoVenc:null,novoCat:'outros',
+  editSalario:false,salInput:'',
+};
+
+// ─── Persistência localStorage ─────────────────────────────────
+function salvarStorage(){
+  try{ localStorage.setItem('mc2026',JSON.stringify(STATE.dados)); }catch(e){}
+}
+function carregarStorage(){
+  try{
+    const s=localStorage.getItem('mc2026');
+    if(s){ STATE.dados=JSON.parse(s); }
+  }catch(e){}
+}
+carregarStorage();
+
+// ─── Utils ────────────────────────────────────────────────────
+function getMes(){ return STATE.dados[STATE.mesIdx]; }
+function updMes(fn){ fn(STATE.dados[STATE.mesIdx]); salvarStorage(); render(); }
+
+function calcTotais(d){
+  let total=0, pago=0;
+  d.contas.forEach(c=>{
+    if(c.sub&&c.sub.length>0){
+      c.sub.forEach(s=>{ total+=(s.valor||0); if(d.subPagas[s.id]) pago+=(s.valor||0); });
+    } else {
+      total+=(c.valor||0);
+      if(d.pagas[c.id]) pago+=(c.valor||0);
+    }
+  });
+  return {total,pago};
+}
+
+function vencBadgeHtml(dia, mesNum, anoNum){
+  if(!dia) return '';
+  const hoje=new Date();
+  const ref=new Date(anoNum,mesNum-1,dia);
+  const refH=new Date(hoje.getFullYear(),hoje.getMonth(),hoje.getDate());
+  const diff=Math.round((ref-refH)/86400000);
+  const cor=diff<0?C_DANGER:diff<=3?C_WARN:C_GREEN;
+  const txt=diff<0?`${Math.abs(diff)}d atraso`:diff===0?'Hoje!':`em ${diff}d`;
+  return `<span class="venc-badge" style="color:${cor};background:${cor}22;border:1px solid ${cor}44">dia ${dia} · ${txt}</span>`;
+}
+
+function checkBtn(pago, size=26){
+  const bc=pago?C_SOFT:C_BORDER;
+  const bg=pago?'linear-gradient(135deg,#f43f7a,#c0134a)':'transparent';
+  const shadow=pago?`box-shadow:0 0 10px ${C_GLOW};`:'';
+  const check=pago?`<svg width="12" height="12" viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>`:'';
+  return `<button class="check-btn" style="width:${size}px;height:${size}px;border:2px solid ${bc};background:${bg};${shadow}" >{CHECK_ONCLICK}>${check}</button>`;
+}
+
+// ─── Day Picker (global overlay) ──────────────────────────────
+function showDayPicker(anchorId, info){
+  STATE.showDayPicker=info;
+  renderDayPicker(anchorId);
+}
+function renderDayPicker(anchorId){
+  let old=document.getElementById('dp-overlay');
+  if(old) old.remove();
+  if(!STATE.showDayPicker) return;
+  const anchor=document.getElementById(anchorId);
+  if(!anchor) return;
+  const dp=document.createElement('div');
+  dp.id='dp-overlay';
+  dp.className='daypicker';
+  const info=STATE.showDayPicker;
+  const cur=info.currentVal;
+  let days='';
+  for(let d=1;d<=31;d++){
+    const sel=d===cur;
+    days+=`<button class="day-btn${sel?' sel':''}" onclick="pickDay(${d})">${d}</button>`;
+  }
+  dp.innerHTML=`<div class="daypicker-title">📅 Dia de vencimento</div><div class="daypicker-grid">${days}</div><button class="dp-remove" onclick="pickDay(null)">Remover</button>`;
+  anchor.style.position='relative';
+  anchor.appendChild(dp);
+  // Fechar ao clicar fora
+  setTimeout(()=>{
+    document.addEventListener('click', function closeDp(e){
+      if(!dp.contains(e.target)&&e.target.id!==anchorId){
+        STATE.showDayPicker=null;
+        dp.remove();
+        document.removeEventListener('click',closeDp);
+      }
+    });
+  },10);
+}
+function pickDay(dia){
+  const info=STATE.showDayPicker;
+  if(!info) return;
+  STATE.showDayPicker=null;
+  if(info.tipo==='main'){
+    updMes(d=>{const c=d.contas.find(x=>x.id===info.contaId);if(c)c.venc=dia;});
+  } else if(info.tipo==='sub'){
+    updMes(d=>{const c=d.contas.find(x=>x.id===info.contaId);if(c){const s=c.sub.find(x=>x.id===info.subId);if(s)s.venc=dia;}});
+  } else if(info.tipo==='novo'){
+    STATE.novoVenc=dia;
+  } else if(info.tipo==='nosub'){
+    STATE.novoSubVenc=dia;
+  }
+  render();
+}
+
+// ─── Ações ────────────────────────────────────────────────────
+function setPagina(p){ STATE.pagina=p; render(); }
+function setMes(i){ STATE.mesIdx=i; STATE.openContaId=null; STATE.editandoContaId=null; STATE.filtro='todas'; render(); }
+function setFiltro(f){ STATE.filtro=f; render(); }
+function toggleOpen(id){ STATE.openContaId=STATE.openContaId===id?null:id; STATE.editandoContaId=null; render(); }
+function toggleEditConta(id){ STATE.editandoContaId=STATE.editandoContaId===id?null:id; render(); }
+
+function togglePago(id){ updMes(d=>{ d.pagas[id]=!d.pagas[id]; }); }
+function toggleSubPago(sid){ updMes(d=>{ d.subPagas[sid]=!d.subPagas[sid]; }); }
+
+function salvarSalario(){
+  const v=parseFloat(document.getElementById('sal-input').value.replace(',','.'));
+  if(!isNaN(v)&&v>0){ updMes(d=>d.salario=v); STATE.editSalario=false; }
+}
+function editarSalario(){ STATE.editSalario=true; STATE.salInput=getMes().salario||''; render(); }
+
+function salvarContaMain(id){
+  const v=parseFloat(document.getElementById('edit-val-'+id).value.replace(',','.'));
+  updMes(d=>{ const c=d.contas.find(x=>x.id===id); if(c){ c.valor=isNaN(v)?0:v; } });
+  STATE.editandoContaId=null;
+}
+
+function deleteConta(id){ updMes(d=>{ d.contas=d.contas.filter(c=>c.id!==id); }); }
+function resetMes(){ updMes(d=>{ d.contas=d.contas.map(c=>c.fixo?c:{...c,valor:0,sub:[]}); d.pagas={}; d.subPagas={}; }); }
+
+function copiarAnterior(){
+  if(STATE.mesIdx===0) return;
+  const ant=deepClone(STATE.dados[STATE.mesIdx-1]);
+  STATE.dados[STATE.mesIdx]={salario:ant.salario,contas:ant.contas,pagas:{},subPagas:{}};
+  salvarStorage(); render();
+}
+
+function adicionarConta(){
+  const nome=document.getElementById('novo-nome').value.trim();
+  const v=parseFloat(document.getElementById('novo-val').value.replace(',','.'));
+  const cat=document.getElementById('novo-cat').value;
+  if(!nome) return;
+  updMes(d=>d.contas.push({id:uid(),nome,valor:isNaN(v)?0:v,venc:STATE.novoVenc,cat,fixo:false,sub:[]}));
+  STATE.novoForm=false; STATE.novoNome=''; STATE.novoVenc=null;
+}
+
+// Sub-itens
+function iniciarAddSub(contaId){ STATE.addingSubContaId=contaId; STATE.editingSubInfo=null; STATE.novoSubVenc=null; render(); }
+function cancelarSub(){ STATE.addingSubContaId=null; STATE.editingSubInfo=null; render(); }
+function salvarNovoSub(contaId){
+  const nome=document.getElementById('sub-nome-new').value.trim();
+  const v=parseFloat(document.getElementById('sub-val-new').value.replace(',','.'));
+  if(!nome||isNaN(v)) return;
+  updMes(d=>{ const c=d.contas.find(x=>x.id===contaId); if(c) c.sub.push({id:uid(),nome,valor:v,venc:STATE.novoSubVenc||null}); });
+  STATE.addingSubContaId=null; STATE.novoSubVenc=null;
+}
+function iniciarEditSub(contaId,subId){ STATE.editingSubInfo={contaId,subId}; STATE.addingSubContaId=null; render(); }
+function salvarEditSub(contaId,subId){
+  const nome=document.getElementById('esub-nome-'+subId).value.trim();
+  const v=parseFloat(document.getElementById('esub-val-'+subId).value.replace(',','.'));
+  if(!nome||isNaN(v)) return;
+  updMes(d=>{ const c=d.contas.find(x=>x.id===contaId); if(c){ const s=c.sub.find(x=>x.id===subId); if(s){s.nome=nome;s.valor=v;} } });
+  STATE.editingSubInfo=null;
+}
+function deleteSub(contaId,subId){ updMes(d=>{ const c=d.contas.find(x=>x.id===contaId); if(c) c.sub=c.sub.filter(s=>s.id!==subId); }); }
+
+// ─── Render ───────────────────────────────────────────────────
+function render(){
+  const app=document.getElementById('app');
+  // Nav
+  document.getElementById('nav-contas').className='nav-btn'+(STATE.pagina==='contas'?' active':'');
+  document.getElementById('nav-relatorio').className='nav-btn'+(STATE.pagina==='relatorio'?' active':'');
+
+  app.innerHTML='';
+  const wrap=document.createElement('div');
+
+  // Header
+  const mes=MESES[STATE.mesIdx];
+  const d=getMes();
+  const {total,pago}=calcTotais(d);
+  const saldo=d.salario!=null?d.salario-total:null;
+  const pct=d.salario?Math.min((total/d.salario)*100,100):0;
+  const pctPago=total>0?(pago/total)*100:0;
+  const semVal=d.contas.filter(c=>c.sub.length===0&&(!c.valor||c.valor===0)).length;
+  const statusCor=saldo==null?C_MUTEDTEXT:saldo<0?C_DANGER:saldo<(d.salario*.1)?C_WARN:C_GREEN;
+
+  // ── Header ──
+  let headerHtml=`
+  <div class="fade" style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:20px;">
+    <div>
+      <div style="font-size:10px;color:${C_ACCENT};font-weight:800;letter-spacing:3px;text-transform:uppercase;margin-bottom:4px;">🌸 Controle Financeiro 2026</div>
+      <h1 style="font-size:24px;font-weight:900;letter-spacing:-.5px;">Minhas <span style="background:linear-gradient(135deg,${C_ACCENT},${C_ROSE});-webkit-background-clip:text;-webkit-text-fill-color:transparent;">Contas</span></h1>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:5px;align-items:flex-end;margin-top:2px;">
+      <button class="btn-ghost" onclick="resetMes()">🔄 Novo mês</button>
+      ${STATE.mesIdx>0?`<button class="btn-ghost" onclick="copiarAnterior()" style="font-size:11px;padding:5px 10px;">📋 Copiar anterior</button>`:''}
+    </div>
+  </div>`;
+
+  // ── Abas mês ──
+  let mesTabsHtml='<div class="mes-scroll">';
+  MESES.forEach((m,i)=>{
+    const ativo=i===STATE.mesIdx;
+    const dd=STATE.dados[i];
+    const temDados=dd.salario!=null||dd.contas.some(c=>c.valor>0||c.sub.length>0);
+    mesTabsHtml+=`<button class="mes-btn${ativo?' active':temDados?' tem-dados':''}" onclick="setMes(${i})">${m.label}${temDados&&!ativo?'<span class="mes-dot"></span>':''}</button>`;
+  });
+  mesTabsHtml+='</div>';
+  mesTabsHtml+=`<div style="font-size:12px;color:${C_MUTEDTEXT};font-weight:700;margin-bottom:14px;">${mes.nome} de ${mes.ano}</div>`;
+
+  if(STATE.pagina==='contas'){
+
+    // ── Salário ──
+    let salHtml=`<div class="card"><div style="font-size:10px;color:${C_ACCENT};font-weight:800;letter-spacing:2px;text-transform:uppercase;margin-bottom:12px;">Salário do mês</div>`;
+    if(d.salario==null||STATE.editSalario){
+      salHtml+=`<div style="display:flex;gap:8px;"><input class="inp mono" type="number" id="sal-input" placeholder="Ex: 3500,00" value="${STATE.editSalario?d.salario:''}" style="font-size:18px;" onkeydown="if(event.key==='Enter')salvarSalario()"/><button class="btn-primary" onclick="salvarSalario()">Salvar</button></div>`;
+    } else {
+      salHtml+=`<div style="display:flex;align-items:center;justify-content:space-between;">
+        <div>
+          <div class="mono" style="font-size:30px;font-weight:700;letter-spacing:-1px;background:linear-gradient(135deg,${C_ROSE},${C_SOFT});-webkit-background-clip:text;-webkit-text-fill-color:transparent;">${fmt(d.salario)}</div>
+          ${semVal>0?`<div style="font-size:11px;color:${C_WARN};margin-top:3px;font-weight:700;">⚠️ ${semVal} conta${semVal>1?'s':''} sem valor</div>`:''}
+        </div>
+        <button class="btn-ghost" onclick="editarSalario()">✏️</button>
+      </div>`;
+    }
+    salHtml+='</div>';
+
+    // ── Resumo ──
+    let resumoHtml='';
+    if(d.salario){
+      resumoHtml=`<div class="card">
+        <div class="resumo-grid">
+          <div class="resumo-card"><div class="resumo-val" style="color:${C_SOFT}">${fmt(total)}</div><div class="resumo-lbl">Total</div></div>
+          <div class="resumo-card"><div class="resumo-val" style="color:${C_GREEN}">${fmt(pago)}</div><div class="resumo-lbl">Pago</div></div>
+          <div class="resumo-card"><div class="resumo-val" style="color:${statusCor}">${fmt(saldo)}</div><div class="resumo-lbl">Saldo</div></div>
+        </div>
+        <div class="barra-wrap">
+          <div class="barra-label"><span>Comprometido</span><span style="color:${pct>90?C_DANGER:pct>70?C_WARN:C_ACCENT}">${pct.toFixed(0)}%</span></div>
+          <div class="barra-bg"><div class="barra-fill" style="width:${pct}%;background:linear-gradient(90deg,${pct>90?C_DANGER:pct>70?C_WARN:C_ACCENT}99,${pct>90?C_DANGER:pct>70?C_WARN:C_ACCENT});box-shadow:0 0 8px ${pct>90?C_DANGER:pct>70?C_WARN:C_ACCENT}55"></div></div>
+        </div>
+        <div class="barra-wrap">
+          <div class="barra-label"><span>Pagas</span><span style="color:${C_GREEN}">${pctPago.toFixed(0)}%</span></div>
+          <div class="barra-bg"><div class="barra-fill" style="width:${pctPago}%;background:linear-gradient(90deg,${C_GREEN}99,${C_GREEN});box-shadow:0 0 8px ${C_GREEN}55"></div></div>
+        </div>
+      </div>`;
+    }
+
+    // ── Filtro ──
+    const filtros=[['todas','Todas'],['pendentes','Pendentes'],['pagas','Pagas']];
+    let filtroHtml='<div class="filtro-wrap">';
+    filtros.forEach(([v,l])=>{ filtroHtml+=`<button class="ftab${STATE.filtro===v?' active':''}" onclick="setFiltro('${v}')">${l}</button>`; });
+    filtroHtml+='</div>';
+
+    // ── Lista contas ──
+    let lista=d.contas.filter(c=>{
+      if(STATE.filtro==='todas') return true;
+      if(STATE.filtro==='pendentes'){
+        if(c.sub.length>0) return c.sub.some(s=>!d.subPagas[s.id]);
+        return !d.pagas[c.id];
+      }
+      if(c.sub.length>0) return c.sub.every(s=>d.subPagas[s.id]);
+      return !!d.pagas[c.id];
+    });
+
+    let listaHtml=`<div style="font-size:10px;color:${C_MUTED};font-weight:800;letter-spacing:2px;text-transform:uppercase;margin-bottom:10px;">${lista.length} conta${lista.length!==1?'s':''}</div>`;
+
+    if(lista.length===0){
+      listaHtml+=`<div class="empty">${STATE.filtro==='pagas'?'Nenhuma paga ainda 🌸':'Tudo em dia! 🎉'}</div>`;
+    }
+
+    lista.forEach(c=>{
+      const cat=CATEGORIAS[c.cat]||CATEGORIAS.outros;
+      const pago=!!d.pagas[c.id];
+      const hasSub=c.sub&&c.sub.length>0;
+      const subTotal=hasSub?c.sub.reduce((a,s)=>a+(s.valor||0),0):0;
+      const pagosSub=hasSub?c.sub.filter(s=>d.subPagas[s.id]).length:0;
+      const semV=!hasSub&&(!c.valor||c.valor===0);
+      const isOpen=STATE.openContaId===c.id;
+      const isEditing=STATE.editandoContaId===c.id;
+      const mes=MESES[STATE.mesIdx];
+
+      // Valor display
+      let valorBtn='';
+      if(isEditing&&!hasSub){
+        valorBtn=`<div class="edit-main">
+          <input class="inp-sm" type="number" id="edit-val-${c.id}" value="${c.valor||''}" style="width:95px;" onkeydown="if(event.key==='Enter')salvarContaMain(${c.id})"/>
+          <div id="main-venc-anchor-${c.id}" style="position:relative;">
+            <button class="venc-btn-sm${c.venc?' tem':''}" onclick="showDayPicker('main-venc-anchor-${c.id}',{tipo:'main',contaId:${c.id},currentVal:${c.venc||null}})">
+              ${c.venc?'📅 Dia '+c.venc:'📅 Venc'}
+            </button>
+          </div>
+          <div style="display:flex;gap:5px;">
+            <button class="btn-cancel" onclick="STATE.editandoContaId=null;render()">✕</button>
+            <button class="btn-ok" onclick="salvarContaMain(${c.id})">ok</button>
+          </div>
+        </div>`;
+      } else {
+        valorBtn=`<button class="conta-valor-btn${semV?' sem-valor':''}" onclick="${hasSub?`toggleOpen(${c.id})`:`toggleEditConta(${c.id})`}">
+          ${hasSub?fmt(subTotal):semV?'R$ ?':fmt(c.valor)}
+        </button>`;
+      }
+
+      let checkHtml='';
+      if(!hasSub){
+        const bc=pago?C_SOFT:C_BORDER;
+        const bg=pago?'linear-gradient(135deg,#f43f7a,#c0134a)':'transparent';
+        const shadow=pago?`box-shadow:0 0 10px ${C_GLOW};`:'';
+        const chk=pago?`<svg width="12" height="12" viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>`:'';
+        checkHtml=`<button class="check-btn" style="width:26px;height:26px;border:2px solid ${bc};background:${bg};${shadow}" onclick="togglePago(${c.id})">${chk}</button>`;
+      } else {
+        checkHtml=`<div style="width:26px;height:26px;display:flex;align-items:center;justify-content:center;font-size:11px;color:${C_MUTEDTEXT};flex-shrink:0;">${pagosSub}/${c.sub.length}</div>`;
+      }
+
+      // Sub-panel
+      let subPanelHtml='';
+      if(isOpen){
+        subPanelHtml='<div class="sub-panel"><div class="sub-label">Sub-itens</div>';
+        c.sub.forEach(s=>{
+          const sp=!!d.subPagas[s.id];
+          const isEditSub=STATE.editingSubInfo&&STATE.editingSubInfo.contaId===c.id&&STATE.editingSubInfo.subId===s.id;
+          const bc2=sp?C_SOFT:C_BORDER;
+          const bg2=sp?'linear-gradient(135deg,#f43f7a,#c0134a)':'transparent';
+          const chk2=sp?`<svg width="10" height="10" viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>`:'';
+          if(isEditSub){
+            subPanelHtml+=`<div class="sub-form">
+              <input class="inp" type="text" id="esub-nome-${s.id}" value="${s.nome.replace(/'/g,"\\'")}"/>
+              <div class="grid2">
+                <input class="inp mono" type="number" id="esub-val-${s.id}" value="${s.valor||''}"/>
+                <div id="esub-venc-anchor-${s.id}" style="position:relative;">
+                  <button class="venc-btn-sm${s.venc?' tem':''}" onclick="showDayPicker('esub-venc-anchor-${s.id}',{tipo:'sub',contaId:${c.id},subId:${s.id},currentVal:${s.venc||null}})">
+                    ${s.venc?'📅 Dia '+s.venc:'📅 Venc'}
+                  </button>
+                </div>
+              </div>
+              <div style="display:flex;gap:8px;">
+                <button class="btn-ok" style="flex:1;padding:8px;" onclick="salvarEditSub(${c.id},${s.id})">Salvar</button>
+                <button class="btn-cancel" onclick="cancelarSub()">✕</button>
+              </div>
+            </div>`;
+          } else {
+            subPanelHtml+=`<div class="sub-row${sp?' pago':''}">
+              <button class="check-btn" style="width:20px;height:20px;flex-shrink:0;border:2px solid ${bc2};background:${bg2};" onclick="toggleSubPago(${s.id})">${chk2}</button>
+              <div style="flex:1;min-width:0;">
+                <div class="sub-nome${sp?' pago':''}">${s.nome}</div>
+                ${s.venc?vencBadgeHtml(s.venc,mes.num,mes.ano):''}
+              </div>
+              <span class="sub-val${sp?' pago':''}">${fmt(s.valor)}</span>
+              <button style="background:transparent;border:none;color:${C_MUTEDTEXT};font-size:14px;padding:0 2px;line-height:1;" onclick="iniciarEditSub(${c.id},${s.id})">✏️</button>
+              <button class="btn-del" onclick="deleteSub(${c.id},${s.id})">×</button>
+            </div>`;
+          }
+        });
+        // Add sub form
+        if(STATE.addingSubContaId===c.id){
+          subPanelHtml+=`<div class="sub-form">
+            <input class="inp" type="text" id="sub-nome-new" placeholder="Nome (ex: Minha fatura)" autofocus/>
+            <div class="grid2">
+              <input class="inp mono" type="number" id="sub-val-new" placeholder="Valor (R$)" onkeydown="if(event.key==='Enter')salvarNovoSub(${c.id})"/>
+              <div id="nosub-venc-anchor" style="position:relative;">
+                <button class="venc-btn-sm${STATE.novoSubVenc?' tem':''}" onclick="showDayPicker('nosub-venc-anchor',{tipo:'nosub',currentVal:${STATE.novoSubVenc||null}})">
+                  ${STATE.novoSubVenc?'📅 Dia '+STATE.novoSubVenc:'📅 Venc'}
+                </button>
+              </div>
+            </div>
+            <div style="display:flex;gap:8px;">
+              <button class="btn-ok" style="flex:1;padding:8px;" onclick="salvarNovoSub(${c.id})">Adicionar</button>
+              <button class="btn-cancel" onclick="cancelarSub()">✕</button>
+            </div>
+          </div>`;
+        } else {
+          subPanelHtml+=`<button class="btn-add-sub" onclick="iniciarAddSub(${c.id})">+ Adicionar sub-item</button>`;
+        }
+        subPanelHtml+='</div>';
+      }
+
+      listaHtml+=`<div class="conta-wrap${isOpen?' open':''}">
+        <div class="conta-main" style="${!hasSub&&pago?'opacity:.45':''}">
+          ${checkHtml}
+          <div class="conta-info" onclick="toggleOpen(${c.id})">
+            <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
+              <span class="conta-nome${!hasSub&&pago?' pago':''}">${c.nome}</span>
+              ${c.fixo?'<span class="badge-fixo">fixo</span>':''}
+              ${hasSub?`<span class="badge-sub">${c.sub.length} itens</span>`:''}
+            </div>
+            <div class="conta-cat">
+              <span style="color:${cat.cor}">${cat.emoji} ${cat.label}</span>
+              ${!hasSub&&c.venc?vencBadgeHtml(c.venc,mes.num,mes.ano):''}
+            </div>
+          </div>
+          ${valorBtn}
+          <button class="btn-expand${isOpen?' open':''}" onclick="toggleOpen(${c.id})">▾</button>
+          <button class="btn-del" onclick="deleteConta(${c.id})">×</button>
+        </div>
+        ${subPanelHtml}
+      </div>`;
+    });
+
+    // Nova conta form
+    if(STATE.novoForm){
+      listaHtml+=`<div class="nova-conta-form">
+        <div style="font-size:10px;color:${C_ACCENT};font-weight:800;letter-spacing:2px;text-transform:uppercase;">Nova Conta</div>
+        <input class="inp" type="text" id="novo-nome" placeholder="Nome" value="${STATE.novoNome}"/>
+        <div class="grid2">
+          <input class="inp mono" type="number" id="novo-val" placeholder="Valor (R$)" onkeydown="if(event.key==='Enter')adicionarConta()"/>
+          <div id="novo-venc-anchor" style="position:relative;">
+            <button class="venc-btn-sm${STATE.novoVenc?' tem':''}" style="width:100%;padding:11px 14px;border-radius:12px;text-align:left;font-size:13px;" onclick="showDayPicker('novo-venc-anchor',{tipo:'novo',currentVal:${STATE.novoVenc||null}})">
+              ${STATE.novoVenc?'📅 Dia '+STATE.novoVenc:'📅 Vencimento'}
+            </button>
+          </div>
+        </div>
+        <select class="inp" id="novo-cat" style="background:var(--bgRow);color:var(--text);">
+          ${Object.entries(CATEGORIAS).map(([k,v])=>`<option value="${k}">${v.emoji} ${v.label}</option>`).join('')}
+        </select>
+        <div style="display:grid;grid-template-columns:1fr auto;gap:8px;">
+          <button class="btn-primary" style="padding:12px;" onclick="adicionarConta()">Adicionar</button>
+          <button class="btn-ghost" onclick="STATE.novoForm=false;render()" style="padding:12px 16px;">✕</button>
+        </div>
+      </div>`;
+    } else {
+      listaHtml+=`<button class="btn-add-conta" onclick="STATE.novoForm=true;render()">+ Adicionar conta</button>`;
+    }
+
+    wrap.innerHTML=headerHtml+mesTabsHtml+salHtml+resumoHtml+filtroHtml+`<div>${listaHtml}</div>`;
+
+  } else {
+    // ── Relatório ──
+    let relHtml=`<div style="font-size:10px;color:${C_ACCENT};font-weight:800;letter-spacing:2px;text-transform:uppercase;margin-bottom:14px;">📊 Relatório Maio–Dez 2026</div>`;
+    MESES.forEach((m,i)=>{
+      const dd=STATE.dados[i];
+      if(!dd.salario){
+        relHtml+=`<div class="rel-mes"><div class="rel-header"><div><div class="rel-nome">${m.nome}</div><div class="rel-sub">Salário não definido</div></div><span style="font-size:11px;color:${C_MUTED};font-weight:700;">—</span></div></div>`;
+        return;
+      }
+      const {total:tt,pago:pp}=calcTotais(dd);
+      const ss=dd.salario-tt;
+      const pc=Math.min((tt/dd.salario)*100,100);
+      const cor=ss<0?C_DANGER:ss<dd.salario*.1?C_WARN:C_GREEN;
+      const semV=dd.contas.filter(c=>c.sub.length===0&&(!c.valor||c.valor===0)).length;
+      relHtml+=`<div class="rel-mes${ss<0?' negativo':''}">
+        <div class="rel-header">
+          <div><div class="rel-nome">${m.nome}</div><div class="rel-sub">Salário: ${fmt(dd.salario)}</div></div>
+          <div><div class="rel-saldo" style="color:${cor}">${fmt(ss)}</div><div class="rel-status" style="color:${ss>=0?C_MUTED:C_DANGER}">${ss>=0?'✅ sobra':'⚠️ falta'}</div></div>
+        </div>
+        <div class="barra-bg" style="margin-bottom:10px;"><div class="barra-fill" style="width:${pc}%;background:${pc>90?C_DANGER:pc>70?C_WARN:C_ACCENT}"></div></div>
+        <div class="rel-grid">
+          <div class="rel-cell"><div class="mono" style="font-size:12px;font-weight:700;color:${C_SOFT}">${fmt(tt)}</div><div class="resumo-lbl" style="margin-top:2px;">Contas</div></div>
+          <div class="rel-cell"><div class="mono" style="font-size:12px;font-weight:700;color:${C_GREEN}">${fmt(pp)}</div><div class="resumo-lbl" style="margin-top:2px;">Pago</div></div>
+          <div class="rel-cell"><div class="mono" style="font-size:12px;font-weight:700;color:${C_WARN}">${fmt(tt-pp)}</div><div class="resumo-lbl" style="margin-top:2px;">Pendente</div></div>
+        </div>
+        ${semV>0?`<div style="font-size:11px;color:${C_WARN};margin-top:8px;font-weight:700;">⚠️ ${semV} conta${semV>1?'s':''} sem valor — saldo pode mudar</div>`:''}
+      </div>`;
+    });
+    wrap.innerHTML=headerHtml+mesTabsHtml+relHtml;
+  }
+
+  app.appendChild(wrap);
+
+  // Focus no input de salário se necessário
+  if(STATE.editSalario||getMes().salario==null){
+    const si=document.getElementById('sal-input');
+    if(si) setTimeout(()=>si.focus(),50);
+  }
+}
+
+// ─── Init ─────────────────────────────────────────────────────
+render();
+</script>
+</body>
+</html>
